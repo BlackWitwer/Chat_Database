@@ -49,10 +49,11 @@ public class PHPController {
 			String val = "";
 			val = addPara(val, OPTION_UPLOAD, OPTION);
 			val = addPara(val, aUserData.getIdentifier(), "identifier");
-			val = addPara(val, aUserData.getIp(), "ip");
-			val = addPara(val, String.valueOf(aUserData.getPort()), "port");
+			val = addPara(val, aUserData.getUsername(), "nickname");
+			//val = addPara(val, aUserData.getIp(), "ip");
+			//val = addPara(val, String.valueOf(aUserData.getPort()), "port");
 
-			System.out.println(uploadStatement(val));
+			System.out.print(uploadStatement(val));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -63,9 +64,10 @@ public class PHPController {
 			String val = "";
 			val = addPara(val, OPTION_LOADMESSAGE, OPTION);
 			String result = uploadStatement(val);
+			System.out.println("Result: \t" + result);
 			return parseTextDatasFromString(result);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -86,7 +88,7 @@ public class PHPController {
 			String result = uploadStatement(val);
 			return parseUserFromString(result);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -120,7 +122,7 @@ public class PHPController {
 			val = addPara(val, aUser.getIdentifier(), "identifier");
 			uploadStatement(val);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			e.printStackTrace();
 		}
 	}
 
@@ -147,7 +149,6 @@ public class PHPController {
 					null, ex);
 		} catch (MalformedURLException ex) {
 		} catch (IOException ex) {
-
 		}
 		return null;
 	}

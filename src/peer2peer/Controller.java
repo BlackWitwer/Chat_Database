@@ -92,7 +92,7 @@ public class Controller {
 
 		getDatabaseConnector().uploadData(getProfile());
 		startTimer();
-		connectOnline();
+		//connectOnline();
 		buildTrayIcon();
 		createAllChat();
 	}
