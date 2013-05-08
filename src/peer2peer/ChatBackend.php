@@ -51,13 +51,15 @@
     } else if($option == "UPMESSAGE") {
         mysql_query("INSERT INTO Messages (Nachricht, Verfasser, Empfaenger) VALUES('$message', '$identifier', '$empfaenger')");
     } else if($option == "LOADMESSAGES") {
-        $result = mysql_query("SELECT Nachricht, Verfasser, Empfaenger, Date FROM Messages WHERE Empfaenger LIKE '%$identifier%' AND Date > (SELECT LastCheck FROM UserData WHERE UserData.Identifier LIKE '$identifier')");
+        $result = mysql_query("SELECT Nachricht, Verfasser, Empfaenger, Datum FROM Messages WHERE Empfaenger LIKE '%$identifier%' AND Datum > (SELECT LastCheck FROM UserData WHERE UserData.Identifier LIKE '$identifier')");
+        echo mysql_error ();
         $users = mysql_query("SELECT Nickname, Identifier FROM UserData");
         $userArray = array();
 
         while ($user = mysql_fetch_array($users)) {
             $userArray[$user[Identifier]] = $user[Nickname];
         }
+
 
         while ($line = mysql_fetch_array($result)) {
             echo ("ASDF");

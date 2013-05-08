@@ -1,5 +1,5 @@
 package peer2peer;
-
+// 74a371de8770829073c56aa88b037ad7
 import connectionPackages.TextData;
 import connectionPackages.UserData;
 
@@ -63,8 +63,9 @@ public class PHPController {
 		try {
 			String val = "";
 			val = addPara(val, OPTION_LOADMESSAGE, OPTION);
+			val = addPara(val, Controller.getProfile().getIdentifier(), "identifier");
 			String result = uploadStatement(val);
-			System.out.println("Result: \t" + result);
+			System.out.println("Result: \t" + result/*.substring(0, result.indexOf(";"))*/);
 			return parseTextDatasFromString(result);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
