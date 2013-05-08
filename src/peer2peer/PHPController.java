@@ -1,14 +1,15 @@
 package peer2peer;
-// 74a371de8770829073c56aa88b037ad7
 import connectionPackages.TextData;
 import connectionPackages.UserData;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,7 +66,7 @@ public class PHPController {
 			val = addPara(val, OPTION_LOADMESSAGE, OPTION);
 			val = addPara(val, Controller.getProfile().getIdentifier(), "identifier");
 			String result = uploadStatement(val);
-			System.out.println("Result: \t" + result/*.substring(0, result.indexOf(";"))*/);
+			System.out.println("Result: \t" + result.substring(0, result.indexOf(";<!--")));
 			return parseTextDatasFromString(result);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -74,12 +75,27 @@ public class PHPController {
 	}
 
 	private ArrayList<TextData> parseTextDatasFromString(String aResult) {
-		ArrayList<TextData> theDatas;
+		//74a371de8770829073c56aa88b037ad7§U§Manu§2§74a371de8770829073c56aa88b037ad7§U§Manu§T§§U§§T§§2§Hallo§2§§1§
+		ArrayList<TextData> theDatas = new ArrayList<TextData>();
 		for (String eachObject : aResult.split("$1$")) {
 			String[] theParas = eachObject.split("$2$");
-			
+			String[] theVerfasser = theParas[0].split("§U§");
+			UserData theVerfasserUsTheUserData = new UserData(theVerfasser[1], theVerfasser[0]);
+
+			HashSet<UserData> theEmpfaengerList = new HashSet<UserData>();
+			for (String eachEmpfaenger : theParas[1].split("§T§")) {
+				String[] theEmpfaenger = eachEmpfaenger.split("§U§");
+				theEmpfaengerList.add(new UserData(theEmpfaenger[1], theEmpfaenger[0]));
+			}
+
+			String theMessage = theParas[3];
+
+			TextData theMessageData = new TextData(theMessage, theVerfasserUsTheUserData);
+			theMessageData.setUsers(theEmpfaengerList);
+
+			theDatas.add(theMessageData);
 		}
-		return null;
+		return theDatas;
 	}
 
 	public ArrayList<UserData> loadAllUsers() {
