@@ -61,9 +61,9 @@ public class ChatGUI extends JFrame{
 			}
 		});
         menu = new JMenuBar();
-		menu.add(screenshotMenu);
-		menu.add(screenshotAreaMenu);
-        menu.add(connectMenu);
+//		menu.add(screenshotMenu);
+//		menu.add(screenshotAreaMenu);
+//      menu.add(connectMenu);
 
 		tabPane = new JTabbedPane();
 
