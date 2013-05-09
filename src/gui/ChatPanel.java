@@ -157,7 +157,7 @@ public class ChatPanel extends JPanel{
 		add(eingabePanel);
 	}
 
-	protected void sendMessage() {
+	private void sendMessage() {
 		String theMessage = eingabe.getText();
 		getChatController().sendToChat(new TextData(theMessage, Controller.getProfile()));
 		writeMessage(new TextData(theMessage, Controller.getProfile()));

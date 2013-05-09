@@ -66,6 +66,7 @@ public class Controller {
 			.createImage("Fehc.png");
 	
 	private static UserData profile;
+	private HashSet<UserData> users;
 	private ArrayList<ChatController> chats;
 	private ChatController allChat;
 	private ArrayList<FileTransferController> fileSends;
@@ -81,8 +82,6 @@ public class Controller {
 	}
 
 	private void init() {
-		profile = new UserData(System.getProperty("user.name"));
-		setStandardPort(PORT);
         chatGUI = new ChatGUI(this);
         getChatGUI().setVisible(true);
 
@@ -90,11 +89,19 @@ public class Controller {
 		conListener = new ConnectionListener(this);
 		interpreter = new DataProgramInterface();
 
-		getDatabaseConnector().uploadData(getProfile());
 		startTimer();
 		//connectOnline();
-		buildTrayIcon();
+		//buildTrayIcon();
 		createAllChat();
+		updateUser();
+
+		profile = findUser(UserData.createIdentifier());
+		if (profile == null) {
+			profile = new UserData(System.getProperty("user.name"));
+			getDatabaseConnector().uploadData(profile);
+		}
+
+		setStandardPort(PORT);
 	}
 
 	public void createConnection(String ip, int aPort) {
@@ -173,13 +180,15 @@ public class Controller {
 		dieGUI.drawImage(img);
 	}
 
-	public void empfangeMessage(TextData aText, UserData aUser) {
-        ChatController theChat = findChat(aText.getUsers());
-        if (theChat != null) {
-            theChat.writeInChat(aText);
-        } else {
-            createChat(aUser).writeInChat(aText);
-        }
+	public void empfangeMessage(TextData aText) {
+		if (!aText.getSender().equals(getProfile())) {
+			ChatController theChat = findChat(aText.getUsers());
+			if (theChat != null) {
+				theChat.writeInChat(aText);
+			} else {
+				createChat(aText.getUsers()).writeInChat(aText);
+			}
+		}
 
         //TODO unten stehende Einfügen
 		/*if (!dieGUI.txtHasFocus()) {
@@ -197,8 +206,12 @@ public class Controller {
 
 	public void updateUser() {
 		dieGUI.updateUser(getConnections());
-        getChatGUI().updateUser(getConnectedUser());
-		getAllChat().setUser(new HashSet<UserData>(getConnectedUser()));
+		HashSet<UserData> theUsers = getDatabaseConnector().loadAllUsers();
+		getChatGUI().updateUser(theUsers);
+		getAllChat().setUser(theUsers);
+		setUsers(theUsers);
+//        getChatGUI().updateUser(getConnectedUser());
+//		getAllChat().setUser(new HashSet<UserData>(getConnectedUser()));
 	}
 
 	public void logMessage(Color c, String message) {
@@ -396,7 +409,13 @@ public class Controller {
         return chats;
     }
 
-    public ChatController createChat(UserData aUser) {
+	public ChatController createChat(UserData aUser) {
+		HashSet<UserData> theSet = new HashSet<UserData>();
+		theSet.add(aUser);
+		return createChat(theSet);
+	}
+
+    public ChatController createChat(HashSet<UserData> aUser) {
         ChatController theChat = new ChatController(aUser, this, getChatGUI());
         getChats().add(theChat);
         getChatGUI().addChatPanel(theChat.getChatPanel());
@@ -406,7 +425,7 @@ public class Controller {
 
 	private void createAllChat() {
 		if (allChat == null) {
-			allChat = new ChatController(null, this, getChatGUI());
+			allChat = new ChatController(new HashSet<UserData>(), this, getChatGUI());
 			getChats().add(getAllChat());
 			getChatGUI().addChatPanel(getAllChat().getChatPanel());
 		}
@@ -449,7 +468,10 @@ public class Controller {
 	}
 	
 	public void loadNewMessages() {
-		getDatabaseConnector().loadNewMessages();
+		//TODO Implementieren
+		for(TextData eachMessage : getDatabaseConnector().loadNewMessages()) {
+			empfangeMessage(eachMessage);
+		}
 	}
 	
 	public void startTimer() {
@@ -489,5 +511,25 @@ public class Controller {
 	private void setStandardPort(int standardPort) {
 		this.standardPort = standardPort;
 		getProfile().setStandardPort(standardPort);
+	}
+
+	public HashSet<UserData> getUsers() {
+		if (users == null) {
+			users = new HashSet<UserData>();
+		}
+		return users;
+	}
+
+	public void setUsers(HashSet<UserData> users) {
+		this.users = users;
+	}
+
+	public UserData findUser(String aIdentifier) {
+		for (UserData eachUser : getUsers()) {
+			if (eachUser.getIdentifier().equals(aIdentifier)) {
+				return eachUser;
+			}
+		}
+		return null;
 	}
 }

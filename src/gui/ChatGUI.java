@@ -3,6 +3,7 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.swing.*;
 
@@ -201,7 +202,7 @@ public class ChatGUI extends JFrame{
         return ctrl;
     }
 
-    public void updateUser(ArrayList<UserData> aUserList) {
+    public void updateUser(HashSet<UserData> aUserList) {
         usersList.setListData(aUserList.toArray(new UserData[0]));
     }
 }

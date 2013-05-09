@@ -30,13 +30,15 @@
         echo (mysql_num_rows( mysql_query("SELECT * FROM UserData WHERE IDENTIFIER LIKE '$identifier'")));
         echo($result);
     } else if ($option == "LOAD") {
-        $result = mysql_query("SELECT IDENTIFIER, IP, PORT, MAX(DATE) FROM UserData Group By IDENTIFIER, IP, PORT");
+        $result = mysql_query("SELECT Nickname, Identifier, Ip, Port FROM UserData");
         while ($line = mysql_fetch_array($result)) {
-                echo $line[IDENTIFIER];
+                echo $line[Nickname];
                 echo (":");
-                echo $line[IP];
+                echo $line[Identifier];
                 echo (":");
-                echo $line[PORT];
+                echo $line[Ip];
+                echo (":");
+                echo $line[Port];
                 echo (";");
         }
         mysql_free_result($result);
@@ -52,7 +54,6 @@
         mysql_query("INSERT INTO Messages (Nachricht, Verfasser, Empfaenger) VALUES('$message', '$identifier', '$empfaenger')");
     } else if($option == "LOADMESSAGES") {
         $result = mysql_query("SELECT Nachricht, Verfasser, Empfaenger, Datum FROM Messages WHERE Empfaenger LIKE '%$identifier%' AND Datum > (SELECT LastCheck FROM UserData WHERE UserData.Identifier LIKE '$identifier')");
-        echo mysql_error ();
         $users = mysql_query("SELECT Nickname, Identifier FROM UserData");
         $userArray = array();
 
@@ -62,31 +63,35 @@
 
 
         while ($line = mysql_fetch_array($result)) {
-            echo ("ASDF");
             echo $line[Verfasser];
-            echo ("§U§");
+            echo ("!U!");
             echo $userArray[$line[Verfasser]];
 
-            echo ("§2§");
+            echo ("!2!");
 
             $empfaenger = explode(";", $line[Empfaenger]);
             foreach ($empfaenger as &$value) {
                 echo $value;
-                echo ("§U§");
+                echo ("!U!");
                 echo $userArray[$value];
-                echo "§T§";
+                echo "!T!";
             }
 
-            echo ("§2§");
+            echo ("!2!");
 
             echo $line[Nachricht];
 
-            echo ("§2§");
+            echo ("!2!");
 
-            echo $line[Date];
+            echo $line[Datum];
 
-            echo ("§1§");
+            echo ("!1!");
         }
+    } else if ($option == "TOUCH_USER_CHECK") {
+        $timestamp = time();
+        $result = mysql_query("UPDATE UserData SET LastCheck=CURRENT_TIMESTAMP WHERE IDENTIFIER = '$identifier'");
+        echo (mysql_error());
+        echo($result);
     }
     mysql_close();
 ?>

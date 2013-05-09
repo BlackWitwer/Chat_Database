@@ -32,6 +32,7 @@ public class PHPController {
 	private static final String OPTION_DELETE = "DELETE";
 	private static final String OPTION_UPMESSAGE = "UPMESSAGE";
 	private static final String OPTION_LOADMESSAGE = "LOADMESSAGES";
+	private static final String OPTION_TOUCH_USER_CHECK = "TOUCH_USER_CHECK";
 
 	public PHPController() {
 		init();
@@ -67,6 +68,7 @@ public class PHPController {
 			val = addPara(val, Controller.getProfile().getIdentifier(), "identifier");
 			String result = uploadStatement(val);
 			System.out.println("Result: \t" + result.substring(0, result.indexOf(";<!--")));
+			touchUserCheck(Controller.getProfile().getIdentifier());
 			return parseTextDatasFromString(result);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -75,30 +77,45 @@ public class PHPController {
 	}
 
 	private ArrayList<TextData> parseTextDatasFromString(String aResult) {
-		//74a371de8770829073c56aa88b037ad7§U§Manu§2§74a371de8770829073c56aa88b037ad7§U§Manu§T§§U§§T§§2§Hallo§2§§1§
+		//74a371de8770829073c56aa88b037ad7!U!Manu!2!74a371de8770829073c56aa88b037ad7!U!Manu!T!!U!!T!!2!Hallo!2!!1!
 		ArrayList<TextData> theDatas = new ArrayList<TextData>();
-		for (String eachObject : aResult.split("$1$")) {
-			String[] theParas = eachObject.split("$2$");
-			String[] theVerfasser = theParas[0].split("§U§");
-			UserData theVerfasserUsTheUserData = new UserData(theVerfasser[1], theVerfasser[0]);
+		for (String eachObject : aResult.substring(1).split("!1!")) {
+			if (!eachObject.contains("<!--")) {
+				String[] theParas = eachObject.split("!2!");
+				String[] theVerfasser = theParas[0].split("!U!");
+				UserData theVerfasserUsTheUserData = new UserData(theVerfasser[1], theVerfasser[0]);
 
-			HashSet<UserData> theEmpfaengerList = new HashSet<UserData>();
-			for (String eachEmpfaenger : theParas[1].split("§T§")) {
-				String[] theEmpfaenger = eachEmpfaenger.split("§U§");
-				theEmpfaengerList.add(new UserData(theEmpfaenger[1], theEmpfaenger[0]));
+				HashSet<UserData> theEmpfaengerList = new HashSet<UserData>();
+				for (String eachEmpfaenger : theParas[1].split("!T!")) {
+					String[] theEmpfaenger = eachEmpfaenger.split("!U!");
+					if (theEmpfaenger.length == 2) {
+						theEmpfaengerList.add(new UserData(theEmpfaenger[1], theEmpfaenger[0]));
+					}
+				}
+
+				String theMessage = theParas[2];
+
+				TextData theMessageData = new TextData(theMessage, theParas[3], theVerfasserUsTheUserData);
+				theMessageData.setUsers(theEmpfaengerList);
+
+				theDatas.add(theMessageData);
 			}
-
-			String theMessage = theParas[3];
-
-			TextData theMessageData = new TextData(theMessage, theVerfasserUsTheUserData);
-			theMessageData.setUsers(theEmpfaengerList);
-
-			theDatas.add(theMessageData);
 		}
 		return theDatas;
 	}
 
-	public ArrayList<UserData> loadAllUsers() {
+	private void touchUserCheck(String aIdentifier) {
+		try {
+			String val = "";
+			val = addPara(val, OPTION_TOUCH_USER_CHECK, OPTION);
+			val = addPara(val, aIdentifier, "identifier");
+			uploadStatement(val);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public HashSet<UserData> loadAllUsers() {
 		try {
 			String val = "";
 			val = addPara(val, OPTION_LOAD, OPTION);
@@ -184,13 +201,13 @@ public class PHPController {
 		return url;
 	}
 
-	private ArrayList<UserData> parseUserFromString(String aVal) {
-		ArrayList<UserData> theUsers = new ArrayList<UserData>();
+	private HashSet<UserData> parseUserFromString(String aVal) {
+		HashSet<UserData> theUsers = new HashSet<UserData>();
 
 		for (String aUserString : aVal.split(";")) {
 			String[] theParas = aUserString.split(":");
-			if (theParas.length == 3 && theParas[0].length() == 32) {
-				theUsers.add(new UserData(theParas[0], theParas[1], Integer.parseInt(theParas[2])));
+			if (theParas.length == 4) {
+				theUsers.add(new UserData(theParas[0], theParas[1], theParas[2], Integer.parseInt(theParas[3]), null));
 			}
 		}
 		return theUsers;

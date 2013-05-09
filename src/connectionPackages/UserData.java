@@ -30,11 +30,7 @@ public class UserData extends DataObject{
 		this(aUsername, createIdentifier());
 	}
 
-	public UserData(String aIdentifier, String aIp, int aStandardPort) {
-		this("Unknown", aIdentifier, aIp, aStandardPort, null);
-	}
-
-	private static String createIdentifier() {
+	public static String createIdentifier() {
 		try {
 			String sDaten = Controller.getMacAddress();
 			MessageDigest md = null;

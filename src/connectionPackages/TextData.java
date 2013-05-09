@@ -6,11 +6,16 @@ import java.util.HashSet;
 public class TextData extends DataObject{
 
 	private String text;
+	private String datum;
     private HashSet<UserData> users;
     
-	public TextData(String aText, UserData aUser) {
+	public TextData(String aText, String aDatum, UserData aUser) {
         super(aUser);
 		text = aText;
+	}
+
+	public TextData (String aText, UserData aUser) {
+		this(aText, null, aUser);
 	}
 	
 	public String getText() {

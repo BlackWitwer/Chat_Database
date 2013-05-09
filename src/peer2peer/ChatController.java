@@ -17,13 +17,13 @@ public class ChatController {
     private ChatGUI gui;
     private ChatPanel chatPanel;
 
-	public ChatController(UserData aUser, Controller aCtrl, ChatGUI aGUI) {
+	public ChatController(HashSet<UserData> aUser, Controller aCtrl, ChatGUI aGUI) {
         this(aUser, aCtrl, aGUI, null);
 	}
 
-	public ChatController(UserData aUser, Controller aCtrl, ChatGUI aGUI, FilePanel aFilePanel) {
-		addUser(aUser);
-		addUser(Controller.getProfile());
+	public ChatController(HashSet<UserData> aUser, Controller aCtrl, ChatGUI aGUI, FilePanel aFilePanel) {
+		aUser.add(Controller.getProfile());
+		setUser(aUser);
 		this.ctrl = aCtrl;
 		this.gui = aGUI;
 		this.chatPanel = new ChatPanel(this, aFilePanel);

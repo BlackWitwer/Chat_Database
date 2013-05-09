@@ -13,7 +13,7 @@ public class DataProgramInterface {
 		if (aObj instanceof UserData) {
 			
 		} else if (aObj instanceof TextData) {
-			aController.empfangeMessage((TextData) aObj, aUser);
+			aController.empfangeMessage((TextData) aObj);
 		} else if (aObj instanceof RequestData) {
 			
 		} else if (aObj instanceof GraphicsData) {
